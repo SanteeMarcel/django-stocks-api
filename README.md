@@ -4,83 +4,37 @@
 
 # Python/Django Challenge
 
-## Description
-This project is designed to test your knowledge of back-end web technologies, specifically in Python/Django, Rest APIs, and decoupled services (microservices).
+super user:
+user = admin
+password = 123456
 
-## Assignment
-The goal of this exercise is to create a simple API using Django and the Django Rest Framework to allow users to query [stock quotes](https://www.investopedia.com/terms/s/stockquote.asp).
-
-The project consists of two separate services:
-* A user-facing API that will receive requests from registered users asking for quote information.
-* An internal stock service that queries external APIs to retrieve the requested quote information.
-
-For simplicity, both services will share the same dependencies (requirements.txt) and can be run from the same virtualenv, but remember that they are still separate processes.
-
-## Minimum requirements
-### API service
-* Use Django's built-in features to create a user and a super user.
-* Endpoints in the API service should require authentication (no anonymous requests should be allowed). Each request should be authenticated via Basic Authentication.
-* When a user makes a request to get a stock quote (calls the stock endpoint in the api service), if a stock is found, it should be saved in the database associated to the user making the request.
-* The response returned by the API service should be like this:
-
-  `GET /stock?q=aapl.us`
-  ```
-    {
-    "name": "APPLE",
-    "symbol": "AAPL.US",
-    "open": 123.66,
-    "high": 123.66,
-    "low": 122.49,
-    "close": 123
-    }
-  ```
-* A user can get his history of queries made to the api service by hitting the history endpoint. The endpoint should return the list of entries saved in the database, showing the latest entries first:
-  
-  `GET /history`
-  ```
-  [
-      {"date": "2021-04-01T19:20:30Z", "name": "APPLE", "symbol": "AAPL.US", "open": "123.66", "high": 123.66, "low": 122.49, "close": "123"},
-      {"date": "2021-03-25T11:10:55Z", "name": "APPLE", "symbol": "AAPL.US", "open": "121.10", "high": 123.66, "low": 122, "close": "122"},
-      ...
-  ]
-  ```
-* A super user (and only super users) can hit the stats endpoint, which will return the top 5 most requested stocks:
-
-  `GET /stats`
-  ```
-  [
-      {"stock": "aapl.us", "times_requested": 5},
-      {"stock": "msft.us", "times_requested": 2},
-      ...
-  ]
-  ```
-* All endpoint responses should be in JSON format.
-
-### Stock service
-* Assume this is an internal service, so requests to endpoints in this service don't need to be authenticated.
-* When a stock request is received, this service should query an external API to get the stock information. For this challege, use this API: `​https://stooq.com/q/l/?s={stock_code}&f=sd2t2ohlcvn&h&e=csv​`.
-* Note that `{stock_code}` above is a parameter that should be replaced with the requested stock code.
-* You can see a list of available stock codes here: https://stooq.com/t/?i=518
-
-## Architecture
-![Architecture Diagram](diagram.svg)
-1. A user makes a request asking for Apple's current Stock quote: `GET /stock?q=aapl.us`
-2. The API service calls the stock service to retrieve the requested stock information
-3. The stock service delegates the call to the external API, parses the response, and returns the information back to the API service.
-4. The API service saves the response from the stock service in the database.
-5. The data is formatted and returned to the user.
-
-## Bonuses
-The following features are optional to implement, but if you do, you'll be ranked higher in our evaluation process.
-* Add unit tests for the bot and the main app.
-* Connect the two services via RabbitMQ instead of doing http calls.
-* Use JWT instead of basic authentication for endpoints.
+normal user:
+user = peter
+password = spiderman
 
 ## How to run the project
 * Create a virtualenv: `python -m venv virtualenv` and activate it `. virtualenv/bin/activate`.
 * Install dependencies: `pip install -r requirements.txt`
-* Start the api service: `cd api_service ; ./manage.py runserver`
-* Start the stock service: `cd stock_service ; ./manage.py runserver`
+* Start the api service: `cd api_service ; ./manage.py runserver 8000`
+* Start the stock service: `cd stock_service ; ./manage.py runserver 8001`
 
-__Important:__ If your implementation requires different steps to start the services
-(like starting a rabbitMQ consumer), document them here!
+
+# How to Use
+
+http post http://127.0.0.1:8000/api/token/ username=peter password=spiderman
+
+This will return two tokens, Access and Refresh. Use Access as a header for all endpoints. Like this:
+
+http post http://127.0.0.1:8000/stock "Authorization: Bearer <access_token here>"  q=aapl.us
+
+Your access token expires in five minutes, so if you need obtain another, use the refesh token:
+
+http post http://127.0.0.1:8000/api/token/refresh/ refresh=<refresh_token here>
+
+http get http://127.0.0.1:8000/stock "Bearer Token <access_token here>" stock_code = aapl.us
+
+http get http://127.0.0.1:8000/history "Bearer Token <access_token here>"
+
+http get http://127.0.0.1:8000/stats "Bearer Token <access_token here>" // must be superuser
+
+Disclaimer: The access token only lasts 5 minutes!

@@ -294,4 +294,4 @@ tags
 .pytest_cache/
 
 # Local generated db
-*.sqlite3
+# *.sqlite3
