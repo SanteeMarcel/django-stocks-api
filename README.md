@@ -21,20 +21,22 @@ password = spiderman
 
 # How to Use
 
-http post http://127.0.0.1:8000/api/token/ username=peter password=spiderman
+**Commands below using httpie**
+
+`http post http://127.0.0.1:8000/api/token/ username=peter password=spiderman`
 
 This will return two tokens, Access and Refresh. Use Access as a header for all endpoints. Like this:
 
-http post http://127.0.0.1:8000/stock "Authorization: Bearer <access_token here>"  stock_code=aapl.us
+`http post http://127.0.0.1:8000/stock "Authorization: Bearer <access_token here>"  stock_code=aapl.us`
 
 Your access token expires in five minutes, so if you need obtain another, use the refesh token:
 
-http post http://127.0.0.1:8000/api/token/refresh/ refresh=<refresh_token here>
+`http post http://127.0.0.1:8000/api/token/refresh/ refresh=<refresh_token here>`
 
-http get http://127.0.0.1:8000/stock "Bearer Token <access_token here>" stock_code = aapl.us
+`http get http://127.0.0.1:8000/stock "Bearer Token <access_token here>" stock_code = aapl.us`
 
-http get http://127.0.0.1:8000/history "Bearer Token <access_token here>"
+`http get http://127.0.0.1:8000/history "Bearer Token <access_token here>"`
 
-http get http://127.0.0.1:8000/stats "Bearer Token <access_token here>" // must be superuser
+`http get http://127.0.0.1:8000/stats "Bearer Token <access_token here>"` // must be superuser
 
 Disclaimer: The access token only lasts 5 minutes!
