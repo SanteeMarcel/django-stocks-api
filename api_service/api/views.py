@@ -27,31 +27,40 @@ class StockView(APIView):
 
                 response = requests.request(
                     "GET", "http://127.0.0.1:8001/stock", data={'stock_code': f'{stock_code}'})
-
                 if response.status_code == 200:
+
                     allData = response.json()
 
-                    data = {"name": allData["Name"], "symbol": allData["Symbol"], "open": allData["Open"],
-                            "high": allData["High"], "low": allData["Low"], "close": allData["Close"]}
+                    print(type(request.user))
 
-                    userRequestHistory = UserRequestHistory()
-                    userRequestHistory.user = request.user
-                    userRequestHistory.date = allData["Date"] + \
-                        "T" + allData["Time"] + "Z"
-                    userRequestHistory.name = allData["Name"]
-                    userRequestHistory.symbol = allData["Symbol"]
-                    userRequestHistory.open = allData["Open"]
-                    userRequestHistory.high = allData["High"]
-                    userRequestHistory.low = allData["Low"]
-                    userRequestHistory.close = allData["Close"]
-                    userRequestHistory.save()
+                    self.save_query_to_db(allData, request.user)
+
+                    data = self.filter_relevant_data(allData)
 
                     return Response(data=data, status=200)
-
                 else:
                     return Response(data=response.json(), status=response.status_code)
+
         except Exception as e:
             return Response({'error': str(e)}, status=500)
+
+    def save_query_to_db(self, allData, user):
+        userRequestHistory = UserRequestHistory()
+        userRequestHistory.user = user
+        userRequestHistory.date = allData["Date"] + \
+            "T" + allData["Time"] + "Z"
+        userRequestHistory.name = allData["Name"]
+        userRequestHistory.symbol = allData["Symbol"]
+        userRequestHistory.open = allData["Open"]
+        userRequestHistory.high = allData["High"]
+        userRequestHistory.low = allData["Low"]
+        userRequestHistory.close = allData["Close"]
+        userRequestHistory.save()
+
+    def filter_relevant_data(self, allData):
+        filtered_data = {"name": allData["Name"], "symbol": allData["Symbol"], "open": allData["Open"],
+                         "high": allData["High"], "low": allData["Low"], "close": allData["Close"]}
+        return filtered_data
 
 
 class HistoryView(generics.ListAPIView):
