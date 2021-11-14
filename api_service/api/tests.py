@@ -8,20 +8,19 @@ from django.db import IntegrityError
 from rest_framework.request import Request
 from django.core.management import call_command
 
+json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
+        'High': '150.4', 'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
+
 
 class TestStockViewDB(TestCase):
 
     def test_should_save_query_to_db(self):
-        json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                'High': '150.4', 'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
         user = User.objects.create_user(username='peter', password='spiderman')
         response = StockView.save_query_to_db(StockView, json, user)
         assert response is None
 
     def test_should_return_error_if_no_user(self):
         with self.assertRaises(IntegrityError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             response = StockView.save_query_to_db(StockView, json, None)
             assert response is None
 
@@ -34,126 +33,118 @@ class TestStockViewDB(TestCase):
 
     def test_should_return_error_if_no_symbol(self):
         with self.assertRaises(KeyError):
-            json = {'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43', 'High': '150.4',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Symbol') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_date(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Time': '22:00:10', 'Open': '148.43', 'High': '150.4',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Date') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_time(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Open': '148.43', 'High': '150.4',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Time') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_open(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'High': '150.4',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Open') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_high(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('High') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_low(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Low') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_close(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Low': '147.48', 'Volume': '63804008', 'Name': 'APPLE'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Close') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
     def test_should_return_error_if_no_name(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Low': '147.48', 'Close': '149.99', 'Volume': '63804008'}
             user = User.objects.create_user(
                 username='peter', password='spiderman')
-            response = StockView.save_query_to_db(StockView, json, user)
+            altered_json = (lambda d: d.pop('Name') and d)(json.copy())
+            response = StockView.save_query_to_db(
+                StockView, altered_json, user)
             assert response is None
 
 
 class TestStockViewFiltering(TestCase):
 
     def test_should_filter_data(self):
-        json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                'High': '150.4', 'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
         data = StockView.filter_relevant_data(StockView, json)
         assert data == {'name': 'APPLE', 'symbol': 'AAPL.US',
                         'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'}
 
     def test_should_return_error_if_no_name(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Low': '147.48', 'Close': '149.99', 'Volume': '63804008'}
-            data = StockView.filter_relevant_data(StockView, json)
+            altered_json = (lambda d: d.pop('Name') and d)(json.copy())
+            data = StockView.filter_relevant_data(StockView, altered_json)
             assert data is None
 
     def test_should_return_error_if_no_symbol(self):
         with self.assertRaises(KeyError):
-            json = {'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43', 'High': '150.4',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
-            data = StockView.filter_relevant_data(StockView, json)
+            altered_json = (lambda d: d.pop('Symbol') and d)(json.copy())
+            data = StockView.filter_relevant_data(StockView, altered_json)
             assert data is None
 
     def test_should_return_error_if_no_open(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'High': '150.4',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
-            data = StockView.filter_relevant_data(StockView, json)
+            altered_json = (lambda d: d.pop('Open') and d)(json.copy())
+            data = StockView.filter_relevant_data(StockView, altered_json)
             assert data is None
 
     def test_should_return_error_if_no_high(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'Low': '147.48', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
-            data = StockView.filter_relevant_data(StockView, json)
+            altered_json = (lambda d: d.pop('High') and d)(json.copy())
+            data = StockView.filter_relevant_data(StockView, altered_json)
             assert data is None
 
     def test_should_return_error_if_no_low(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Close': '149.99', 'Volume': '63804008', 'Name': 'APPLE'}
-            data = StockView.filter_relevant_data(StockView, json)
+            altered_json = (lambda d: d.pop('Low') and d)(json.copy())
+            data = StockView.filter_relevant_data(StockView, altered_json)
             assert data is None
 
     def test_should_return_error_if_no_close(self):
         with self.assertRaises(KeyError):
-            json = {'Symbol': 'AAPL.US', 'Date': '2021-11-12', 'Time': '22:00:10', 'Open': '148.43',
-                    'High': '150.4', 'Low': '147.48', 'Volume': '63804008', 'Name': 'APPLE'}
-            data = StockView.filter_relevant_data(StockView, json)
+            altered_json = (lambda d: d.pop('Close') and d)(json.copy())
+            data = StockView.filter_relevant_data(StockView, altered_json)
             assert data is None
 
 
