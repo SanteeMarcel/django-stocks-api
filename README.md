@@ -21,6 +21,8 @@ password = spiderman
 
 # How to Use
 
+**Commands below using httpie**
+
 http post http://127.0.0.1:8000/api/token/ username=peter password=spiderman
 
 This will return two tokens, Access and Refresh. Use Access as a header for all endpoints. Like this:
