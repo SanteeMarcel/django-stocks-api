@@ -21,7 +21,13 @@ class StockView(APIView):
 
     def get(self, request, *args, **kwargs):
 
-        stock_code = request.data.get('stock_code')
+        stock_code = request.GET.get("stock_code", "EmptyError")
+
+        if stock_code == "EmptyError":
+            json = {"Error": "Stock code is empty"}
+            status = 204
+            return Response(json, status)
+
         try:
             with requests.Session() as s:
 
