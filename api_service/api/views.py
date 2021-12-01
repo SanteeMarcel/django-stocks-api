@@ -7,10 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from api.models import UserRequestHistory
 from api.serializers import UserRequestHistorySerializer
+from django.db.models import Count
 
 import requests
-import sqlite3
-from pathlib import Path
 
 
 class StockView(APIView):
@@ -18,6 +17,7 @@ class StockView(APIView):
     Endpoint to allow users to query stocks
     """
     permission_classes = (IsAuthenticated,)
+    serializer_class = UserRequestHistorySerializer
 
     def get(self, request, *args, **kwargs):
 
@@ -41,7 +41,9 @@ class StockView(APIView):
 
                     self.save_query_to_db(allData, request.user)
 
-                    data = self.filter_relevant_data(allData)
+                    serializer = self.serializer_class(allData)
+
+                    data = serializer.data
 
                     return Response(data=data, status=200)
                 else:
@@ -63,11 +65,6 @@ class StockView(APIView):
         userRequestHistory.close = allData["Close"]
         userRequestHistory.save()
 
-    def filter_relevant_data(self, allData):
-        filtered_data = {"name": allData["Name"], "symbol": allData["Symbol"], "open": allData["Open"],
-                         "high": allData["High"], "low": allData["Low"], "close": allData["Close"]}
-        return filtered_data
-
 
 class HistoryView(generics.ListAPIView):
     """
@@ -81,7 +78,7 @@ class HistoryView(generics.ListAPIView):
         user_id = request.user.id
         queryset = self.queryset.filter(user_id=user_id)[::-1]
         serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
+        return Response(data=serializer.data, status=200)
 
 
 class StatsView(APIView):
@@ -89,21 +86,14 @@ class StatsView(APIView):
     Allows super users to see which are the most queried stocks.
     """
     permission_classes = (IsAuthenticated,)
+    queryset = UserRequestHistory.objects.all()
 
     def get(self, request, *args, **kwargs):
-        conn = None
 
         if not request.user.is_superuser:
             return Response({"error": "You are not authorized to access this endpoint"}, status=403)
 
-        try:
-            conn = sqlite3.connect(
-                str(Path(__file__).resolve().parents[1]) + '/db.sqlite3')
-            sql = 'SELECT name, count(*) FROM api_userrequesthistory GROUP BY name ORDER by COUNT(*) DESC LIMIT 5;'
-            cur = conn.cursor()
-            cur.execute(sql)
-            conn.commit()
-            rows = cur.fetchall()
-            return Response(data=rows, status=200)
-        except sqlite3.Error as e:
-            return Response({"error": str(e)}, status=500)
+        queryset = self.queryset.values('name').annotate(
+            count=Count('name')).order_by('-count')[:5]
+
+        return Response(data=queryset, status=200)
