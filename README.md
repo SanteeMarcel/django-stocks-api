@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/Jobsity/ReactChallenge/main/src/assets/jobsity_logo_small.png"/>
+    <img src="https://main--elegant-rugelach-0bd4a4.netlify.app/_app/immutable/assets/jobsity-color.f8ccd325.svg"/>
 </div>
 
 # Python/Django Challenge
