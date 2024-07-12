@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
     examples=[OpenApiExample(name='stock_info', value={'name': 'APPLE', 'symbol': 'AAPL.US',
                         'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
     parameters=[
-    OpenApiParameter(name='stock_code', type=str, location=OpenApiParameter.QUERY),
+    OpenApiParameter(name='stock', type=str, location=OpenApiParameter.QUERY),
 ])
 class StockView(APIView):
     """
@@ -29,7 +29,7 @@ class StockView(APIView):
     def get(self, request, *args, **kwargs):
         logger.info("StockView GET request received")
         
-        stock_code = request.GET.get("stock_code", None)
+        stock_code = request.GET.get("stock", None)
         logger.info(f"Received stock_code: {stock_code}")
 
         if not stock_code:
