@@ -13,7 +13,10 @@ password = spiderman
 * Create a virtualenv: `python3 -m venv virtualenv` and activate it `. virtualenv/bin/activate`.
 * Install dependencies: `pip install -r requirements.txt`
 * Run migrations and start api service: `cd api_service ; python3 manage.py migrate; ./manage.py runserver 8000`
+* (Optional) Run unit tests `./manage.py test`
+* On a new terminal activate the env again `. virtualenv/bin/activate`
 * Start the stock service: `cd stock_service ; ./manage.py runserver 8001`
+* (Optional) Run unit tests `./manage.py test`
 
 
 # How to Use
