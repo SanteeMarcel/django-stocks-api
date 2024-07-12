@@ -26,7 +26,9 @@ Generate a token at /api/token and any of the credentials listed above.
 Insert the token at "Authorize" at the top.
 Use the "/stock" endpoint to query stock.
 Use the "/history" endpoint to see your own query history.
-Use the "/stats" endpoint to check up the most queried stocks, require superuser.
+Use the "/stats" endpoint to check up the most queried stocks, requires superuser.
+
+Your access token only lasts 5 minutes, use your refresh token at /api/token/refresh to get a new one.
 
 **Commands below using curl**
 
@@ -56,4 +58,4 @@ The database should never be running alongside the application layer, this is fo
 
 Logging to console is fine for debugging purposes, but in production it's better to have more robust monitoring tools.
 
-User credentials and access tokens should never be hardcoded.
+User credentials and access tokens should never be hardcoded, this is also for illustration purposes only.
