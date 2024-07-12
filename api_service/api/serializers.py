@@ -9,3 +9,7 @@ class UserRequestHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRequestHistory
         exclude = ['id', 'user']
+
+class HistoryCounterSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    count = serializers.IntegerField()
