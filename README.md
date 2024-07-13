@@ -62,3 +62,8 @@ The database should never be running alongside the application layer, this is fo
 Logging to console is fine for debugging purposes, but in production it's better to have more robust monitoring tools.
 
 User credentials and access tokens should never be hardcoded, this is also for illustration purposes only.
+
+# TODOs?
+
+Add docker
+Segregate database
