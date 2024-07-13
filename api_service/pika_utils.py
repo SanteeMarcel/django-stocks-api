@@ -2,9 +2,11 @@ import pika
 import uuid
 import json
 
+
 class RabbitMQProducer:
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters('localhost'))
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(queue='', exclusive=True)
@@ -27,7 +29,8 @@ class RabbitMQProducer:
         self.response = None
         self.corr_id = str(uuid.uuid4())
 
-        message = json.dumps({'stock_ticker': stock_ticker, 'user_id': user_id})
+        message = json.dumps(
+            {'stock_ticker': stock_ticker, 'user_id': user_id})
         self.channel.basic_publish(
             exchange='',
             routing_key='stock_queue',
@@ -40,8 +43,9 @@ class RabbitMQProducer:
 
         while self.response is None:
             self.connection.process_data_events()
-        
+
         return self.response
+
 
 def get_stock_data(stock_ticker, user_id):
     producer = RabbitMQProducer()

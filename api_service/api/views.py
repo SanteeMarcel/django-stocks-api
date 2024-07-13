@@ -12,12 +12,14 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 
 logger = logging.getLogger(__name__)
 
-@extend_schema( 
+
+@extend_schema(
     examples=[OpenApiExample(name='stock_info', value={'name': 'APPLE', 'symbol': 'AAPL.US',
-                        'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
+                                                       'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
     parameters=[
-    OpenApiParameter(name='stock', type=str, location=OpenApiParameter.QUERY),
-])
+        OpenApiParameter(name='stock', type=str,
+                         location=OpenApiParameter.QUERY),
+    ])
 class StockView(APIView):
     """
     Endpoint to allow users to query stocks.
@@ -25,18 +27,18 @@ class StockView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserRequestHistorySerializer
 
-
     def get(self, request, *args, **kwargs):
 
         logger.info("StockView GET request received")
-        
+
         stock_code = request.GET.get("stock", None)
         logger.info(f"Received stock_code: {stock_code}")
 
         if not stock_code:
             json_response = {"Error": "Stock code is empty"}
             response_status = http_status.HTTP_400_BAD_REQUEST
-            logger.warning(f"Response JSON: {json_response}, Status: {response_status}")
+            logger.warning(
+                f"Response JSON: {json_response}, Status: {response_status}")
             return Response(json_response, status=response_status)
 
         try:
@@ -46,7 +48,8 @@ class StockView(APIView):
                 # params = {'stock_code': stock_code}
                 # response = s.get(url, params=params)
                 response = get_stock_data(stock_code, request.user.id)
-                logger.info(f"Received response from stock service: {response}")
+                logger.info(
+                    f"Received response from stock service: {response}")
                 response, status = response['response'], response['status']
                 if status == http_status.HTTP_200_OK:
                     all_data = response
@@ -64,8 +67,9 @@ class StockView(APIView):
                     return Response(data=data, status=http_status.HTTP_200_OK)
                 else:
                     error = response["Error"]
-                    logger.error(f"Error response from stock service: {status}, {error}")
-                    return Response(data={"Error" : error}, status=status)
+                    logger.error(
+                        f"Error response from stock service: {status}, {error}")
+                    return Response(data={"Error": error}, status=status)
 
         except requests.RequestException as e:
             logger.error(f"RequestException occurred: {e}")
@@ -92,9 +96,10 @@ class StockView(APIView):
         except Exception as e:
             logger.error(f"Error saving query to DB: {e}")
 
-@extend_schema( 
+
+@extend_schema(
     examples=[OpenApiExample(name='stock_info', value={'name': 'APPLE', 'symbol': 'AAPL.US',
-                        'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
+                                                       'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
 )
 class HistoryView(generics.ListAPIView):
     """
@@ -102,25 +107,25 @@ class HistoryView(generics.ListAPIView):
     """
     serializer_class = UserRequestHistorySerializer
     permission_classes = (IsAuthenticated,)
-    
+
     def get_queryset(self):
         return UserRequestHistory.objects.filter(user=self.request.user).order_by('-id')
 
     def get(self, request, *args, **kwargs):
         logger.info("HistoryView GET request received")
-        
+
         user_id = request.user.id
         logger.info(f"Current user ID: {user_id}")
-        
+
         queryset = self.get_queryset()
-        
+
         if not queryset.exists():
             logger.info("No history found for the user")
             return Response(status=http_status.HTTP_204_NO_CONTENT)
-        
+
         serializer = self.serializer_class(queryset, many=True)
         logger.info(f"Serialized user history data: {serializer.data}")
-        
+
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
@@ -131,7 +136,7 @@ class StatsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
-        responses= {
+        responses={
             200: HistoryCounterSerializer(many=True),
         }
     )
@@ -144,11 +149,11 @@ class StatsView(APIView):
 
         top_stocks = UserRequestHistory.objects.values('name').annotate(
             times_requested=Count('name')).order_by('-times_requested')
-        
+
         if not top_stocks:
             logger.info("No stock queries found")
             return Response(status=http_status.HTTP_204_NO_CONTENT)
-        
+
         NO_OF_TOP_STOCKS = 5
         top_stocks = top_stocks[:NO_OF_TOP_STOCKS]
         logger.info(f"Top queried stocks: {top_stocks}")
