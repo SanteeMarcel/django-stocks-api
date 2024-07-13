@@ -3,6 +3,8 @@ import json
 import logging
 from django.core.management.base import BaseCommand
 from stocks.views import StockView
+from django.conf import settings
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +36,8 @@ class Command(BaseCommand):
     help = 'Runs the RabbitMQ consumer'
 
     def handle(self, *args, **kwargs):
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters('localhost'))
+        params = pika.URLParameters(settings.RABBITMQ_URL)
+        connection = pika.BlockingConnection(params)
         channel = connection.channel()
 
         channel.queue_declare(queue='stock_queue')

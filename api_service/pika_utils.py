@@ -1,12 +1,13 @@
 import pika
 import uuid
 import json
+from django.conf import settings
 
 
 class RabbitMQProducer:
     def __init__(self):
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters('localhost'))
+        params = pika.URLParameters(settings.RABBITMQ_URL)
+        self.connection = pika.BlockingConnection(params)
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(queue='', exclusive=True)
