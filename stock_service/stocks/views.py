@@ -4,13 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
 import csv
-
-
 import logging
-import requests
-import csv
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import status as http_status
 
 logger = logging.getLogger(__name__)
@@ -20,15 +14,14 @@ class StockView(APIView):
     Receives stock requests from the API service.
     """
 
-    def get(self, request, *args, **kwargs):
-        stock_code = request.GET.get("stock_code", None)
+    def get_stock_data(self, stock_code):
         logger.info(f"Received stock_code: {stock_code}")
 
         if not stock_code:
             json_response = {"Error": "Stock code is empty"}
             response_status = http_status.HTTP_400_BAD_REQUEST
             logger.warning(f"Response JSON: {json_response}, Status: {response_status}")
-            return Response(json_response, status=response_status)
+            return json_response, response_status
 
         try:
             with requests.Session() as s:
@@ -52,7 +45,7 @@ class StockView(APIView):
             response_status = http_status.HTTP_500_INTERNAL_SERVER_ERROR
         finally:
             logger.info(f"Response JSON: {json_response}, Status: {response_status}")
-            return Response(json_response, status=response_status)
+            return json_response, response_status
 
     def decoder(self, data):
         logger.info(f"Decoding data...")
@@ -81,3 +74,8 @@ class StockView(APIView):
         
         logger.info(f"Decoded JSON: {json_response}, Status: {response_status}")
         return json_response, response_status
+
+    def get(self, request, *args, **kwargs):
+        stock_code = request.GET.get("stock_code", None)
+        json_response, response_status = self.get_stock_data(stock_code)
+        return Response(json_response, status=response_status)

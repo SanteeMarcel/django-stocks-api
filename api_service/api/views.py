@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
 from api.models import UserRequestHistory
 from api.serializers import UserRequestHistorySerializer, HistoryCounterSerializer
+from pika_utils import get_stock_data
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ class StockView(APIView):
 
 
     def get(self, request, *args, **kwargs):
+
         logger.info("StockView GET request received")
         
         stock_code = request.GET.get("stock", None)
@@ -41,13 +42,14 @@ class StockView(APIView):
         try:
             with requests.Session() as s:
                 logger.info("Sending request to stock service")
-                url = "http://127.0.0.1:8001/stock"
-                params = {'stock_code': stock_code}
-                response = s.get(url, params=params)
-                logger.info(f"Received response from stock service: {response.status_code}")
-
-                if response.status_code == http_status.HTTP_200_OK:
-                    all_data = response.json()
+                # url = "http://127.0.0.1:8001/stock"
+                # params = {'stock_code': stock_code}
+                # response = s.get(url, params=params)
+                response = get_stock_data(stock_code, request.user.id)
+                logger.info(f"Received response from stock service: {response}")
+                response, status = response['response'], response['status']
+                if status == http_status.HTTP_200_OK:
+                    all_data = response
                     logger.info(f"Received data: {all_data}")
 
                     logger.info(f"User: {request.user}")
@@ -61,9 +63,9 @@ class StockView(APIView):
 
                     return Response(data=data, status=http_status.HTTP_200_OK)
                 else:
-                    error_response = response.json()
-                    logger.error(f"Error response from stock service: {response.status_code}, {error_response}")
-                    return Response(data=error_response, status=response.status_code)
+                    error = response["Error"]
+                    logger.error(f"Error response from stock service: {status}, {error}")
+                    return Response(data={"Error" : error}, status=status)
 
         except requests.RequestException as e:
             logger.error(f"RequestException occurred: {e}")
@@ -141,7 +143,7 @@ class StatsView(APIView):
             return Response({"error": "You are not authorized to access this endpoint"}, status=http_status.HTTP_403_FORBIDDEN)
 
         top_stocks = UserRequestHistory.objects.values('name').annotate(
-            count=Count('name')).order_by('-count')
+            times_requested=Count('name')).order_by('-times_requested')
         
         if not top_stocks:
             logger.info("No stock queries found")

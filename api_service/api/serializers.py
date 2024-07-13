@@ -12,4 +12,4 @@ class UserRequestHistorySerializer(serializers.ModelSerializer):
 
 class HistoryCounterSerializer(serializers.Serializer):
     name = serializers.CharField()
-    count = serializers.IntegerField()
+    times_requested = serializers.IntegerField()
