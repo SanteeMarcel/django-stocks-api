@@ -5,7 +5,7 @@ from rest_framework import status
 from unittest.mock import patch, Mock
 from .models import UserRequestHistory
 from requests import RequestException
-
+from api.views import get_stock_data
 
 class StockViewTests(APITestCase):
 
@@ -16,39 +16,40 @@ class StockViewTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         self.url = reverse('stock-view')
 
-    @patch('requests.Session.get')
-    def test_get_stock_success(self, mock_get):
-        mock_response = Mock()
-        expected_data = {
-            "date": "2023-07-12",
-            "time": "12:34:56",
-            "name": "Test Stock",
-            "symbol": "TST",
-            "open": 100.0,
-            "high": 110.0,
-            "low": 90.0,
-            "close": 105.0
+    @patch('api.views.get_stock_data')
+    def test_get_stock_success(self, mock_get_stock_data):
+        mock_response = {
+            "response": {
+                "date": "2023-07-12",
+                "time": "12:34:56",
+                "name": "Test Stock",
+                "symbol": "TST",
+                "open": 100.0,
+                "high": 110.0,
+                "low": 90.0,
+                "close": 105.0
+            },
+            "status": status.HTTP_200_OK
         }
-        mock_response.json.return_value = expected_data
-        mock_response.status_code = status.HTTP_200_OK
-        mock_get.return_value = mock_response
+        mock_get_stock_data.return_value = mock_response
 
         response = self.client.get(self.url, {'stock': 'TST'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['symbol'], 'TST')
 
-    @patch('requests.Session.get')
-    def test_get_stock_not_found(self, mock_get):
-        mock_response = Mock()
-        mock_response.json.return_value = {"detail": "Not found"}
-        mock_response.status_code = status.HTTP_404_NOT_FOUND
-        mock_get.return_value = mock_response
+    @patch('api.views.get_stock_data')
+    def test_get_stock_not_found(self, mock_get_stock_data):
+        mock_response = {
+            "response": {"Error": "Stock not found"},
+            "status": status.HTTP_404_NOT_FOUND
+        }
+        mock_get_stock_data.return_value = mock_response
 
         response = self.client.get(self.url, {'stock': 'INVALID'})
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['detail'], 'Not found')
+        self.assertEqual(response.data['Error'], 'Stock not found')
 
     def test_get_stock_no_code(self):
         response = self.client.get(self.url)
@@ -56,16 +57,14 @@ class StockViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['Error'], 'Stock code is empty')
 
-    @patch('requests.Session.get')
-    def test_get_stock_service_unavailable(self, mock_get):
-        mock_get.side_effect = RequestException
+    @patch('api.views.get_stock_data')
+    def test_get_stock_service_unavailable(self, mock_get_stock_data):
+        mock_get_stock_data.side_effect = RequestException
 
         response = self.client.get(self.url, {'stock': 'TST'})
 
-        self.assertEqual(response.status_code,
-                         status.HTTP_503_SERVICE_UNAVAILABLE)
-        self.assertEqual(response.data['error'],
-                         'Unable to fetch stock information')
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertEqual(response.data['error'], 'Unable to fetch stock information')
 
 
 class HistoryViewTests(APITestCase):
