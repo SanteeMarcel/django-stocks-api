@@ -10,6 +10,7 @@ class UserRequestHistorySerializer(serializers.ModelSerializer):
         model = UserRequestHistory
         exclude = ['id', 'user']
 
+
 class HistoryCounterSerializer(serializers.Serializer):
     name = serializers.CharField()
     times_requested = serializers.IntegerField()

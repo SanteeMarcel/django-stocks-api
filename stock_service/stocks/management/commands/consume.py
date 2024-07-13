@@ -6,6 +6,7 @@ from stocks.views import StockView
 
 logger = logging.getLogger(__name__)
 
+
 def on_request(ch, method, properties, body):
     message = json.loads(body)
     stock_code = message['stock_ticker']
@@ -15,7 +16,8 @@ def on_request(ch, method, properties, body):
     view = StockView()
     json_response, response_status = view.get_stock_data(stock_code)
 
-    response_message = json.dumps({"response": json_response, "status": response_status})
+    response_message = json.dumps(
+        {"response": json_response, "status": response_status})
     ch.basic_publish(
         exchange='',
         routing_key=properties.reply_to,
@@ -27,16 +29,19 @@ def on_request(ch, method, properties, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
     logger.info(f"Processed and sent response: {response_message}")
 
+
 class Command(BaseCommand):
     help = 'Runs the RabbitMQ consumer'
 
     def handle(self, *args, **kwargs):
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters('localhost'))
         channel = connection.channel()
 
         channel.queue_declare(queue='stock_queue')
         channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue='stock_queue', on_message_callback=on_request)
+        channel.basic_consume(queue='stock_queue',
+                              on_message_callback=on_request)
 
         self.stdout.write(' [*] Waiting for messages. To exit press CTRL+C')
         channel.start_consuming()
