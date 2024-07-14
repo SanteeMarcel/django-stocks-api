@@ -54,7 +54,7 @@ class StockView(APIView):
         return json_response, response_status
 
     def decoder(self, data):
-        logger.info(f"Decoding data...")
+        logger.info("Decoding data...")
         decoded = data.decode('utf-8')
         logger.info(f"Decoded data: {decoded[:100]}")
         rows = [x for x in csv.reader(decoded.splitlines(), delimiter=',')]

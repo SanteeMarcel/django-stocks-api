@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 def on_request(ch, method, properties, body):
     message = json.loads(body)
     stock_code = message['stock_ticker']
-    user_id = message['user_id']
     logger.info(f"Received message with stock_code: {stock_code}")
 
     view = StockView()
