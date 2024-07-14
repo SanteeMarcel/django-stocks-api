@@ -52,34 +52,30 @@ class StockView(APIView):
             return Response(json_response, status=response_status)
 
         try:
-            with requests.Session() as s:
-                logger.info("Sending request to stock service")
-                # url = "http://127.0.0.1:8001/stock"
-                # params = {'stock_code': stock_code}
-                # response = s.get(url, params=params)
-                response = get_stock_data(stock_code, request.user.id)
-                logger.info(
-                    f"Received response from stock service: {response}")
-                response, status = response['response'], response['status']
-                if status == http_status.HTTP_200_OK:
-                    all_data = response
-                    logger.info(f"Received data: {all_data}")
+            logger.info("Sending request to stock service")
+            response = get_stock_data(stock_code, request.user.id)
+            logger.info(
+                f"Received response from stock service: {response}")
+            response, status = response['response'], response['status']
+            if status == http_status.HTTP_200_OK:
+                all_data = response
+                logger.info(f"Received data: {all_data}")
 
-                    logger.info(f"User: {request.user}")
+                logger.info(f"User: {request.user}")
 
-                    serializer = self.serializer_class(all_data)
-                    data = serializer.data
+                serializer = self.serializer_class(all_data)
+                data = serializer.data
 
-                    logger.info(f"Serialized data: {data}")
+                logger.info(f"Serialized data: {data}")
 
-                    self.save_query_to_db(all_data, request.user)
+                self.save_query_to_db(all_data, request.user)
 
-                    return Response(data=data, status=http_status.HTTP_200_OK)
-                else:
-                    error = response["Error"]
-                    logger.error(
-                        f"Error response from stock service: {status}, {error}")
-                    return Response(data={"Error": error}, status=status)
+                return Response(data=data, status=http_status.HTTP_200_OK)
+            else:
+                error = response["Error"]
+                logger.error(
+                    f"Error response from stock service: {status}, {error}")
+                return Response(data={"Error": error}, status=status)
 
         except requests.RequestException as e:
             logger.error(f"RequestException occurred: {e}")

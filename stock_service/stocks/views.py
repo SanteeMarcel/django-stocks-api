@@ -50,7 +50,8 @@ class StockView(APIView):
         finally:
             logger.info(
                 f"Response JSON: {json_response}, Status: {response_status}")
-            return json_response, response_status
+
+        return json_response, response_status
 
     def decoder(self, data):
         logger.info(f"Decoding data...")
