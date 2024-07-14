@@ -2,6 +2,8 @@
 
 Microservices running through containers using Django backend.
 
+[Architecture](docker-compose.png)
+
 ## Sample users for testing
 
 super user:
