@@ -14,11 +14,21 @@ logger = logging.getLogger(__name__)
 
 
 @extend_schema(
-    examples=[OpenApiExample(name='stock_info', value={'name': 'APPLE', 'symbol': 'AAPL.US',
-                                                       'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
+    examples=[
+        OpenApiExample(
+            name='stock_info',
+            value={
+                'name': 'APPLE',
+                'symbol': 'AAPL.US',
+                'open': '148.43',
+                'low': '147.48',
+                'high': '150.4',
+                'close': '149.99'})],
     parameters=[
-        OpenApiParameter(name='stock', type=str,
-                         location=OpenApiParameter.QUERY),
+        OpenApiParameter(
+            name='stock',
+            type=str,
+            location=OpenApiParameter.QUERY),
     ])
 class StockView(APIView):
     """
@@ -73,10 +83,12 @@ class StockView(APIView):
 
         except requests.RequestException as e:
             logger.error(f"RequestException occurred: {e}")
-            return Response({'error': 'Unable to fetch stock information'}, status=http_status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response({'error': 'Unable to fetch stock information'},
+                            status=http_status.HTTP_503_SERVICE_UNAVAILABLE)
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
-            return Response({'error': 'An unexpected error occurred'}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'An unexpected error occurred'},
+                            status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def save_query_to_db(self, all_data, user):
         logger.info("Saving query to DB")
@@ -98,8 +110,16 @@ class StockView(APIView):
 
 
 @extend_schema(
-    examples=[OpenApiExample(name='stock_info', value={'name': 'APPLE', 'symbol': 'AAPL.US',
-                                                       'open': '148.43', 'low': '147.48', 'high': '150.4', 'close': '149.99'})],
+    examples=[
+        OpenApiExample(
+            name='stock_info',
+            value={
+                'name': 'APPLE',
+                'symbol': 'AAPL.US',
+                'open': '148.43',
+                'low': '147.48',
+                'high': '150.4',
+                'close': '149.99'})],
 )
 class HistoryView(generics.ListAPIView):
     """
@@ -109,7 +129,8 @@ class HistoryView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return UserRequestHistory.objects.filter(user=self.request.user).order_by('-id')
+        return UserRequestHistory.objects.filter(
+            user=self.request.user).order_by('-id')
 
     def get(self, request, *args, **kwargs):
         logger.info("HistoryView GET request received")
@@ -145,7 +166,8 @@ class StatsView(APIView):
 
         if not request.user.is_superuser:
             logger.warning("Unauthorized access attempt by non-superuser")
-            return Response({"error": "You are not authorized to access this endpoint"}, status=http_status.HTTP_403_FORBIDDEN)
+            return Response({"error": "You are not authorized to access this endpoint"},
+                            status=http_status.HTTP_403_FORBIDDEN)
 
         top_stocks = UserRequestHistory.objects.values('name').annotate(
             times_requested=Count('name')).order_by('-times_requested')

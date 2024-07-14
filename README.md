@@ -1,4 +1,8 @@
-# Python/Django Challenge
+## Description
+
+Microservices running through containers using Django backend.
+
+## Sample users for testing
 
 super user:
 
@@ -16,6 +20,14 @@ password = spiderman
 * Ensure you have docker installed
 * Use `docker-compose up` at root.
 * Access http://127.0.0.1:8000/api/schema/swagger-ui/
+
+## How to run unit tests
+
+* Ensure you have python3 installed.
+* Create a virtualenv: `python3 -m venv virtualenv` and activate it `. virtualenv/bin/activate`.
+* Install dependencies: `pip install -r requirements.txt`
+* Run unit tests `./stock_service/manage.py test`
+* Run unit tests `./api_service/manage.py test`
 
 
 # How to Use
