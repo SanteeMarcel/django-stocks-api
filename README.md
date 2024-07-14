@@ -76,6 +76,6 @@ I used postgresql due to popularity, but if we expect the `/stock` endpoint to b
 
 Logging to console is fine for debugging purposes, but in production it's better to have more robust monitoring tools.
 
-User credentials and access tokens should never be hardcoded, this is for illustration purposes only.
+User credentials and access tokens should never be hardcoded, this is for illustration purposes only. I would probably use a .env file for storing secrets.
 
 `autopep8` for code style compliance. `pika` instead of `celery` for simplicity. `drf-spectacular` instead of `drf-yasg` due to openapi 3.0 support and being updated much more often.
