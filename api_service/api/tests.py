@@ -7,6 +7,7 @@ from .models import UserRequestHistory
 from requests import RequestException
 from api.views import get_stock_data
 
+
 class StockViewTests(APITestCase):
 
     def setUp(self):
@@ -63,8 +64,12 @@ class StockViewTests(APITestCase):
 
         response = self.client.get(self.url, {'stock': 'TST'})
 
-        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
-        self.assertEqual(response.data['error'], 'Unable to fetch stock information')
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertEqual(
+            response.data['error'],
+            'Unable to fetch stock information')
 
 
 class HistoryViewTests(APITestCase):
@@ -117,7 +122,8 @@ class StatsViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
-            response.data['error'], 'You are not authorized to access this endpoint')
+            response.data['error'],
+            'You are not authorized to access this endpoint')
 
     def test_stats_no_data(self):
         self.client.force_authenticate(user=self.superuser)

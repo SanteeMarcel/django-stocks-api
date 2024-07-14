@@ -1,22 +1,33 @@
-# Python/Django Challenge
+## Description
+
+Microservices running through containers using Django backend.
+
+## Sample users for testing
 
 super user:
+
 user = admin
+
 password = 123456
 
 normal user:
+
 user = peter
+
 password = spiderman
 
 ## How to run the project
-* Ensure you have python3 and a running rabbitmq local server installed.
+* Ensure you have docker installed
+* Use `docker-compose up` at root.
+* Access http://127.0.0.1:8000/api/schema/swagger-ui/
+
+## How to run unit tests
+
+* Ensure you have python3 installed.
 * Create a virtualenv: `python3 -m venv virtualenv` and activate it `. virtualenv/bin/activate`.
 * Install dependencies: `pip install -r requirements.txt`
-* Run migrations and start api service: `cd api_service ; python3 manage.py migrate; ./manage.py runserver 8000`
-* (Optional) Run unit tests `./manage.py test`
-* On a new terminal activate the env again `. virtualenv/bin/activate`
-* Start the stock service: `cd stock_service ; ./manage.py consume`
-* (Optional) Run unit tests `./manage.py test`
+* Run unit tests `./stock_service/manage.py test`
+* Run unit tests `./api_service/manage.py test`
 
 
 # How to Use
@@ -59,16 +70,8 @@ Disclaimer: The access token only lasts 5 minutes!
 
 # Considerations
 
-sqlite is not suitable for production, I would probably use a nosql database for faster writes, or a more suitable SQL vendor for faster reads of aggregate data.
-
-The database should never be running alongside the application layer, this is for illustrative purposes only.
+I used postgresql due to popularity, but if we expect the `/stock` endpoint to be called much more often than `/history` and `/stats` I would consider a nosql database for faster writes.
 
 Logging to console is fine for debugging purposes, but in production it's better to have more robust monitoring tools.
 
-User credentials and access tokens should never be hardcoded, this is also for illustration purposes only.
-
-# TODOs?
-
-Add docker
-
-Segregate database
+User credentials and access tokens should never be hardcoded, this is for illustration purposes only.

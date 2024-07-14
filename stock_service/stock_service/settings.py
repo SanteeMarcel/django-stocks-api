@@ -2,6 +2,9 @@
 
 from pathlib import Path
 from sys import stdout
+import os
+from urllib.parse import urlparse
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -124,3 +127,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
 }
+
+RABBITMQ_URL = os.environ.get(
+    'RABBITMQ_URL',
+    'amqp://guest:guest@localhost:5672/')
