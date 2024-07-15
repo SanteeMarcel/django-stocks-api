@@ -4,6 +4,8 @@ Microservices running through containers using Django backend.
 
 ![Architecture](docker-compose.png)
 
+Explanation video: https://youtu.be/U61AIP_PxLQ
+
 ## Sample users for testing
 
 super user:
