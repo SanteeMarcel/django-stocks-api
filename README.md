@@ -1,83 +1,70 @@
+Here's a revised version of your README with improved readability, especially in the endpoint section:
+
+---
+
 ## Description
 
-Microservices running through containers using Django backend.
+Microservices running through containers using a Django backend.
 
 ![Architecture](docker-compose.png)
 
-Explanation video: https://youtu.be/U61AIP_PxLQ
+Explanation video: [Watch here](https://youtu.be/U61AIP_PxLQ)
 
-## Sample users for testing
+## Sample Users for Testing
 
-super user:
+**Super User:**
+- Username: `admin`
+- Password: `123456`
 
-user = admin
+**Normal User:**
+- Username: `peter`
+- Password: `spiderman`
 
-password = 123456
+## How to Run the Project
 
-normal user:
+1. Ensure you have Docker installed.
+2. Use `docker-compose up` at the root of the project directory.
+3. Access the application at [http://127.0.0.1:8000/api/schema/swagger-ui/](http://127.0.0.1:8000/api/schema/swagger-ui/).
 
-user = peter
+## How to Run Unit Tests
 
-password = spiderman
+1. Ensure you have Python 3 installed.
+2. Create a virtual environment and activate it:
+    ```sh
+    python3 -m venv virtualenv
+    source virtualenv/bin/activate
+    ```
+3. Install dependencies:
+    ```sh
+    pip install -r requirements.txt
+    ```
+4. Run unit tests for each service:
+    ```sh
+    ./stock_service/manage.py test
+    ./api_service/manage.py test
+    ```
 
-## How to run the project
-* Ensure you have docker installed
-* Use `docker-compose up` at root.
-* Access http://127.0.0.1:8000/api/schema/swagger-ui/
+## How to Use
 
-## How to run unit tests
+### Using Swagger
 
-* Ensure you have python3 installed.
-* Create a virtualenv: `python3 -m venv virtualenv` and activate it `. virtualenv/bin/activate`.
-* Install dependencies: `pip install -r requirements.txt`
-* Run unit tests `./stock_service/manage.py test`
-* Run unit tests `./api_service/manage.py test`
+1. Access the Swagger UI at [http://127.0.0.1:8000/api/schema/swagger-ui/](http://127.0.0.1:8000/api/schema/swagger-ui/).
+2. Generate a token at `/api/token` using any of the credentials listed above.
+3. Insert the token at the "Authorize" button at the top of the Swagger UI.
+4. Use the following endpoints:
+    - **`/stock`**: Query stock information.
+    - **`/history`**: View your query history.
+    - **`/stats`**: Check the most queried stocks (requires superuser access).
 
+Your access token lasts 5 minutes. Use the refresh token at `/api/token/refresh` to get a new one.
 
-# How to Use
+## Considerations
 
-**Using Swagger**
+- PostgreSQL is used due to its popularity. If the `/stock` endpoint is expected to be called much more frequently than `/history` and `/stats`, consider using a NoSQL database for faster writes.
+- Logging to the console is fine for debugging, but in production, use robust monitoring tools.
+- User credentials and access tokens should never be hardcoded. This is for illustration purposes only. Use a `.env` file for storing secrets.
+- Use `autopep8` for code style compliance. 
+- Consider using `pika` instead of `celery` for simplicity.
+- Use `drf-spectacular` instead of `drf-yasg` due to better support for OpenAPI 3.0 and more frequent updates.
 
-Access http://127.0.0.1:8000/api/schema/swagger-ui/
-
-Generate a token at /api/token and any of the credentials listed above.
-
-Insert the token at "Authorize" at the top.
-
-Use the "/stock" endpoint to query stock.
-
-Use the "/history" endpoint to see your own query history.
-
-Use the "/stats" endpoint to check up the most queried stocks, requires superuser.
-
-Your access token only lasts 5 minutes, use your refresh token at /api/token/refresh to get a new one.
-
-**Commands below using curl**
-
-`curl -X POST http://127.0.0.1:8000/api/token/ -d "username=peter" -d "password=spiderman"`
-
-This will return two tokens, Access and Refresh. Use Access as a header for all endpoints. Like this:
-
-`curl -X GET "http://127.0.0.1:8000/stock?stock_code=aapl.us" -H "Authorization: Bearer <access_token>"`
-
-Your access token expires in five minutes, so if you need obtain another, use the refresh token:
-
-`curl -X POST http://127.0.0.1:8000/api/token/refresh/ -d "refresh=<refresh_token>"`
-
-`curl -X GET "http://127.0.0.1:8000/stock?stock_code=aapl.us" -H "Authorization: Bearer <access_token>"`
-
-`curl -X GET http://127.0.0.1:8000/history -H "Authorization: Bearer <access_token>"`
-
-`curl -X GET http://127.0.0.1:8000/stats -H "Authorization: Bearer <access_token>"` // must be superuser
-
-Disclaimer: The access token only lasts 5 minutes!
-
-# Considerations
-
-I used postgresql due to popularity, but if we expect the `/stock` endpoint to be called much more often than `/history` and `/stats` I would consider a nosql database for faster writes.
-
-Logging to console is fine for debugging purposes, but in production it's better to have more robust monitoring tools.
-
-User credentials and access tokens should never be hardcoded, this is for illustration purposes only. I would probably use a .env file for storing secrets.
-
-`autopep8` for code style compliance. `pika` instead of `celery` for simplicity. `drf-spectacular` instead of `drf-yasg` due to openapi 3.0 support and being updated much more often.
+---
