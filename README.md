@@ -1,7 +1,3 @@
-Here's a revised version of your README with improved readability, especially in the endpoint section:
-
----
-
 ## Description
 
 Microservices running through containers using a Django backend.
