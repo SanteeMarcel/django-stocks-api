@@ -60,7 +60,7 @@ Your access token lasts 5 minutes. Use the refresh token at `/api/token/refresh`
 - Logging to the console is fine for debugging, but in production, use robust monitoring tools.
 - User credentials and access tokens should never be hardcoded. This is for illustration purposes only. Use a `.env` file for storing secrets.
 - Use `autopep8` for code style compliance. 
-- Consider using `pika` instead of `celery` for simplicity.
-- Use `drf-spectacular` instead of `drf-yasg` due to better support for OpenAPI 3.0 and more frequent updates.
+- I used `pika` instead of `celery` for simplicity.
+- I used `drf-spectacular` instead of `drf-yasg` due to better support for OpenAPI 3.0 and more frequent updates.
 
 ---
